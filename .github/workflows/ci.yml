@@ -10,6 +10,7 @@ on:
       - main
     tags: ["*"]
   pull_request:
+  workflow_dispatch: # This allows us to manually trigger
 
 concurrency:
   group: test-${{ github.head_ref }}
@@ -138,18 +139,6 @@ jobs:
           name: Release v${{ env.new_version }}
           draft: false
           prerelease: ${{ env.prerelease }}
-
-      - name: Publish to PyPI
-        if: ${{ steps.release_check.outputs.run_release == 'true' }}
-        env:
-          # 1) Get key from https://pypi.org/manage/account/token/
-          # 2) Copy it to Github > repo > Settings > Secrets > Actions > New repository secret
-          HATCH_INDEX_USER: __token__
-          HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
-        shell: bash
-        run: |
-          hatch build
-          hatch publish
   
       - name: Upload Pages Artifact
         if: ${{ steps.release_check.outputs.run_release == 'true' }}
@@ -164,3 +153,15 @@ jobs:
         uses: actions/deploy-pages@v4
         with:
           artifact_name: github-pages
+
+      - name: Publish to PyPI
+        if: ${{ steps.release_check.outputs.run_release == 'true' }}
+        env:
+          # 1) Get key from https://pypi.org/manage/account/token/
+          # 2) Copy it to Github > repo > Settings > Secrets > Actions > New repository secret
+          HATCH_INDEX_USER: __token__
+          HATCH_INDEX_AUTH: ${{ secrets.PYPI_TOKEN }}
+        shell: bash
+        run: |
+          hatch build
+          hatch publish
