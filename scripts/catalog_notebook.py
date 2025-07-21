@@ -104,7 +104,6 @@ def _(current_time, mo, release_published, tag_name):
 def _(mo):
     mo.md(
         rf"""
-    ---
     The dataframe has several useful [attributes](https://sxs.readthedocs.io/en/main/api/simulations/#simulationsdataframe-class) that allow selecting important subsets of the data.  Use the buttons below to select those subsets.
     """
     )
@@ -197,40 +196,31 @@ def _(deprecation, df0, eccentricity, precession, system_type):
 
 
 @app.cell(hide_code=True)
-def _(mo, simple_filtering):
-    # Brief instructions for the table
-    (
-        mo.md("---\nClick the column headings to sort or filter by any value.")
-        if simple_filtering.value
-        else mo.md("---\nClick the column headings to sort.  Add a transform to filter or otherwise alter the data table.")
-    )
-    return
-
-
-@app.cell(hide_code=True)
 def _(mo):
-    simple_filtering = mo.ui.checkbox(label="Simple filtering")
-    simple_filtering
-    return (simple_filtering,)
+    expert_filtering = mo.ui.switch(label="Expert filtering")
+    expert_filtering
+    return (expert_filtering,)
 
 
 @app.cell(hide_code=True)
-def _(df, mo, simple_filtering):
-    if simple_filtering.value:
-        table = mo.ui.table(df, page_size=20, show_column_summaries=True, max_columns=df.shape[1]+1)
-    else:
+def _(df, expert_filtering, mo):
+    if expert_filtering.value:
+        infotext = mo.md("Click the column headings to sort.  Add a transform to filter or otherwise alter the data table.")
         table = mo.ui.dataframe(df, page_size=20)
-    table
+    else:
+        infotext = mo.md("Click the column headings to sort or filter by any value.")
+        table = mo.ui.table(df, page_size=20, show_column_summaries=True, max_columns=df.shape[1]+1)
+    mo.vstack([infotext, table])
     return (table,)
 
 
 @app.cell(hide_code=True)
-def _(mo, simple_filtering):
+def _(expert_filtering, mo):
     mo.md(
         "We can plot selected columns from the filtered data above."
         + (
             "  If you select checkboxes in the table, only those rows will be plotted."
-            if simple_filtering.value else ""
+            if not expert_filtering.value else ""
         )
     )
     return
