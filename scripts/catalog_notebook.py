@@ -69,7 +69,9 @@ def _(pd):
     release_published = pd.to_datetime(latest_release["published_at"]).strftime("%B %d, %Y")
 
     # Note that we load the dataframe as `df0`, so that we can filter it below as `df`
-    df0 = sxscatalog.load("dataframe", tag=tag_name)
+    with mo.status.spinner(subtitle="Loading catalog dataframe ...") as _spinner:
+        with mo.persistent_cache(name=f"sxscatalog_{tag_name}_dataframe"):
+            df0 = sxscatalog.load("dataframe", tag=tag_name)
 
     # The dataframe is actually a sxs.SimulationsDataFrame (so that we can have attributes like df.BBH),
     # which subclasses — but is not a — pd.DataFrame, so marimo fanciness doesn't work if the dataframe
