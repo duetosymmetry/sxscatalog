@@ -74,7 +74,7 @@ class RITSimulations(Simulations):
         branches_data = filter(lambda b: b["name"].startswith("RITv"),
                                branches_response.json())
         latest_release = max(branches_data,
-                             key=lambda b: Version(b["name"].split("v")[1]))
+                             key=lambda b: Version(b["name"].removeprefix("RITv")))
         return latest_release
 
     @classmethod
@@ -145,7 +145,7 @@ class RITSimulations(Simulations):
             else:
                 # Files will be named RITsimulations_RITvXXXX.bz2
                 tags = [
-                    Version(f.stem.split("_")[-1].split("v")[-1])
+                    Version(f.stem.split("_")[-1].removeprefix("RITv"))
                     for f in sxs_directory("cache").glob("RITsimulations_*.bz2")
                 ]
                 if tags:
@@ -159,8 +159,8 @@ class RITSimulations(Simulations):
                     raise ValueError(f"No simulations files found in the cache and {download=} was passed")
 
         # Normalize the tag to "RITv" followed by a normalized Version
-        tag = tag.split("RIT")[-1] if tag.startswith("RIT") else tag
-        tag = tag.split("v")[-1] if tag.startswith("v") else tag
+        tag = tag.removeprefix("RIT") if tag.startswith("RIT") else tag
+        tag = tag[1:] if tag.startswith("v") else tag
         tag = f"RITv{Version(tag)}"
 
         cache_path = sxs_directory("cache") / f"RITsimulations_{tag}.bz2"
@@ -399,7 +399,7 @@ class MAYASimulations(Simulations):
         branches_data = filter(lambda b: b["name"].startswith("MAYAv"),
                                branches_response.json())
         latest_release = max(branches_data,
-                             key=lambda b: Version(b["name"].split("v")[1]))
+                             key=lambda b: Version(b["name"].removeprefix("MAYAv")))
         return latest_release
 
     @classmethod
@@ -470,7 +470,7 @@ class MAYASimulations(Simulations):
             else:
                 # Files will be named MAYAsimulations_MAYAvXXXX.bz2
                 tags = [
-                    Version(f.stem.split("_")[-1].split("v")[-1])
+                    Version(f.stem.split("_")[-1].removeprefix("MAYAv"))
                     for f in sxs_directory("cache").glob("MAYAsimulations_*.bz2")
                 ]
                 if tags:
@@ -484,8 +484,8 @@ class MAYASimulations(Simulations):
                     raise ValueError(f"No simulations files found in the cache and {download=} was passed")
 
         # Normalize the tag to "MAYAv" followed by a normalized Version
-        tag = tag.split("MAYA")[-1] if tag.startswith("MAYA") else tag
-        tag = tag.split("v")[-1] if tag.startswith("v") else tag
+        tag = tag.removeprefix("MAYA") if tag.startswith("MAYA") else tag
+        tag = tag[1:] if tag.startswith("v") else tag
         tag = f"MAYAv{Version(tag)}"
 
         cache_path = sxs_directory("cache") / f"MAYAsimulations_{tag}.bz2"
