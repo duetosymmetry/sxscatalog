@@ -192,7 +192,6 @@ def _(deprecation, df0, eccentricity, precession, system_type):
     columns = preferred_columns + [c for c in df.columns if c not in preferred_columns]
     df = df[columns]
 
-    df["SXS ID"] = list(df.index)
     return df, preferred_columns
 
 
@@ -289,7 +288,7 @@ def _(
     vertical_axis,
 ):
     # Compose the plot
-    used_selectors = ["SXS ID"] + preferred_columns + [
+    used_selectors = preferred_columns + [
         s.value for s in selectors if s.value is not None and s.value not in preferred_columns
     ]
     #used_selectors = ["SXS ID"] + [s.value for s in selectors if s.value is not None]
@@ -313,6 +312,7 @@ def _(
             strokeWidth=1,
             opacity=0.8,
         )
+        .properties(width="container")
         .encode(**kwargs),
         legend_selection=True,
         label="SXS Simulations"
@@ -362,7 +362,7 @@ def _(chart_data, math, mo, tag_name):
         )
     )
     final_table = (
-        mo.ui.table(chart_data.drop("SXS ID", axis=1), page_size=20, show_download=False)
+        mo.ui.table(chart_data, page_size=20, show_download=False)
         if len(chart_data) > 0
         else mo.md("Select a region in the plot above to see details here")
     )
